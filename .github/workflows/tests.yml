@@ -76,5 +76,5 @@ jobs:
       - name: Check Environment Variables
         run: cat .env
 
-      - name: Run Tests
-        run: ./vendor/bin/phpunit
+      - name: Tests
+      run: ./vendor/bin/pest
