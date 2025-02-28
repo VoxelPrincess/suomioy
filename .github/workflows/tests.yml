@@ -77,4 +77,4 @@ jobs:
         run: cat .env
 
       - name: Tests
-      run: ./vendor/bin/pest
+        run: ./vendor/bin/pest
