@@ -61,7 +61,7 @@ jobs:
           echo "DB_CONNECTION=sqlite" >> .env
           echo "DB_DATABASE=$(pwd)/database/database.sqlite" >> .env
 
-      - name: Install Dependencies
+      - name: Install PHP Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Copy Environment File
@@ -76,5 +76,5 @@ jobs:
       - name: Check Environment Variables
         run: cat .env
 
-      - name: Tests
+      - name: Run Tests
         run: ./vendor/bin/pest
