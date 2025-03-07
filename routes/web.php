@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 Route::get('/', function (): InertiaResponse {
     return Inertia::render('welcome');
@@ -22,7 +23,7 @@ Route::get('/person/{id}', function (string $id): InertiaResponse {
     ]);
 })->name('person');
 
-### ✅ **Добавлен маршрут для списка фамилий (`/surnames`)**
+### **Added route for surname list (`/surnames`)**
 Route::get('/surnames', function (): InertiaResponse {
     $names = DB::table('person')
         ->select([
@@ -31,7 +32,7 @@ Route::get('/surnames', function (): InertiaResponse {
         ])
         ->groupBy('last_name')
         ->orderBy('amount', 'DESC')
-        ->limit(50) // Показываем топ-50 фамилий
+        ->limit(50) // Show the top 50 surnames
         ->get();
 
     return Inertia::render('surnames', [
@@ -39,6 +40,7 @@ Route::get('/surnames', function (): InertiaResponse {
     ]);
 })->name('surnames');
 
+### **Added route for specific surname (`/surnames/{name}`)**
 Route::get('/surnames/{name}', function (string $name): InertiaResponse {
     // Capitalize the first letter of the surname before using it in queries
     $formattedName = ucfirst($name);
@@ -73,6 +75,24 @@ Route::get('/surnames/{name}', function (string $name): InertiaResponse {
         'oldestLiving' => $oldestLiving
     ]);
 })->name('surname');
+
+### **Added route for updating a person's deathday (`POST /person/{id}`)**
+Route::post('/person/{id}', function (Request $request, string $id) {
+    // Validate the input, deathday should be either a date or null
+    $request->validate([
+        'deathday' => 'nullable|date',
+    ]);
+
+    // Update deathday in the database
+    DB::table('person')
+        ->where('id', '=', $id)
+        ->update([
+            'deathday' => $request->input('deathday'),
+        ]);
+
+    // Redirect back to the person's page
+    return redirect()->route('person', ['id' => $id]);
+})->name('update-person');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
