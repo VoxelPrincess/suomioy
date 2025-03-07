@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import BasicLayout from '../layouts/basic-layout';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type Props = {
     names: {
