@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import BasicLayout from '@/layouts/basic-layout';
 
 // TODO: We will have props soon.
 type Props = {
@@ -10,11 +11,13 @@ type Props = {
 
 const Surname: FC<Props> = ({ name }) => {
     return (
-        <div>
-            <h1>
-                {name.name} {name.amount} kpl
-            </h1>
-        </div>
+        <BasicLayout>
+            <div>
+                <h1>
+                    {name.name} {name.amount} kpl
+                </h1>
+            </div>
+        </BasicLayout>
     );
 };
 

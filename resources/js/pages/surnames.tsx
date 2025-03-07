@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import BasicLayout from '../layouts/basic-layout';
+import { Link } from '@inertiajs/react';
 
 type Props = {
     names: {
@@ -9,27 +11,31 @@ type Props = {
 
 const Surnames: FC<Props> = ({ names }) => {
     return (
-        <div>
-            <h1>Suosituimmat sukunimet!</h1>
-            <table border={1}>
+        <BasicLayout>
+            <h1 className="text-xl font-bold mb-4">Suosituimmat sukunimet!</h1>
+            <table className="border-collapse border border-gray-300 w-full">
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Amount</th>
+                    <tr className="bg-gray-200">
+                        <th className="border border-gray-300 p-2">#</th>
+                        <th className="border border-gray-300 p-2">Name</th>
+                        <th className="border border-gray-300 p-2">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
                     {names.map((name, i) => (
-                        <tr key={name.name}>
-                            <td>{i + 1}</td>
-                            <td>{name.name}</td>
-                            <td>{name.amount}</td>
+                        <tr key={name.name} className="hover:bg-gray-100">
+                            <td className="border border-gray-300 p-2">{i + 1}</td>
+                            <td className="border border-gray-300 p-2">
+                                <Link className="text-blue-700 underline" href={route('surname', { name: name.name })}>
+                                    {name.name} 
+                                </Link>
+                            </td>
+                            <td className="border border-gray-300 p-2">{name.amount}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-        </div>
+        </BasicLayout>
     );
 };
 
