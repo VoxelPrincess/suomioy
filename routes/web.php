@@ -10,10 +10,15 @@ Route::get('/', function (): InertiaResponse {
     return Inertia::render('welcome');
 })->name('home');
 
+### **Route to fetch a specific person by ID**
 Route::get('/person/{id}', function (string $id): InertiaResponse {
     $person = DB::table('person')
         ->select([
-            '*' // Fetching all columns is bad practice, define specific columns in real applications
+            'id',
+            'first_name',
+            'last_name',
+            'birthday',
+            'deathday'
         ])
         ->where('id', '=', $id)
         ->firstOrFail();
@@ -23,12 +28,13 @@ Route::get('/person/{id}', function (string $id): InertiaResponse {
     ]);
 })->name('person');
 
-### **Added route for surname list (`/surnames`)**
+### **Route to fetch a list of surnames (`/surnames`)**
 Route::get('/surnames', function (): InertiaResponse {
     $names = DB::table('person')
         ->select([
             'last_name AS name',
-            DB::raw('COUNT(last_name) as amount')
+            DB::raw('COUNT(last_name) as amount'),
+            DB::raw('MIN(id) as id') // Include the ID of one person with this surname
         ])
         ->groupBy('last_name')
         ->orderBy('amount', 'DESC')
@@ -40,9 +46,8 @@ Route::get('/surnames', function (): InertiaResponse {
     ]);
 })->name('surnames');
 
-### **Added route for specific surname (`/surnames/{name}`)**
+### **Route to fetch details of a specific surname (`/surnames/{name}`)**
 Route::get('/surnames/{name}', function (string $name): InertiaResponse {
-    // Capitalize the first letter of the surname before using it in queries
     $formattedName = ucfirst($name);
 
     // Retrieve the count of people with the given surname
@@ -56,8 +61,8 @@ Route::get('/surnames/{name}', function (string $name): InertiaResponse {
         ->where('last_name', '=', $formattedName)
         ->firstOrFail();
 
-    // Retrieve the 30 oldest living people with the given surname
-    $oldestLiving = DB::table('person')
+    // Retrieve a list of people with this surname
+    $people = DB::table('person')
         ->select([
             'id',
             'first_name',
@@ -65,29 +70,29 @@ Route::get('/surnames/{name}', function (string $name): InertiaResponse {
             'birthday'
         ])
         ->where('last_name', '=', $formattedName)
-        ->whereNull('deathday') // Only include living people (death date is null)
-        ->orderBy('birthday', 'DESC') // Sort by birthday, oldest first
-        ->limit(30) // Get the first 30 oldest people
+        ->orderBy('birthday', 'ASC') // Sort by birthday first
+        ->orderBy('first_name', 'DESC') // Then by first name in descending order
+        ->orderBy('id', 'ASC') // Finally, by ID for stability
         ->get();
 
     return Inertia::render('surname', [
         'name' => $data,
-        'oldestLiving' => $oldestLiving
+        'people' => $people
     ]);
 })->name('surname');
 
-### **Added route for updating a person's deathday (`POST /person/{id}`)**
+### **Route for updating a person's deathday (`POST /person/{id}`)**
 Route::post('/person/{id}', function (Request $request, string $id) {
     // Validate the input, deathday should be either a date or null
-    $request->validate([
-        'deathday' => 'nullable|date',
+    $validatedData = $request->validate([
+        'deathday' => 'nullable|date', // Ensures it's a valid date or null
     ]);
 
     // Update deathday in the database
     DB::table('person')
         ->where('id', '=', $id)
         ->update([
-            'deathday' => $request->input('deathday'),
+            'deathday' => $validatedData['deathday'],
         ]);
 
     // Redirect back to the person's page
