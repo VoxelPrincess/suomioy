@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import BasicLayout from '@/layouts/basic-layout';
 import Link from '@/components/Link';
-import { route } from 'ziggy-js';
 import clsx from 'clsx';
 
 type Props = {
@@ -27,9 +26,9 @@ const Surname: FC<Props> = ({ name, people }) => {
 
                 <ul className="my-4">
                     {people.map((person) => (
-                        <li key={person.id} className="p-2 border-b">
+                        <li key={person.id} className={clsx('p-2', 'border-b')}>
                             {person.last_name}, {person.first_name} ({person.birthday}){' '}
-                            <Link className="text-blue-700 underline" href={route('person', { id: person.id })}>
+                            <Link className="text-blue-700 underline" href={`/person/${person.id}`}>
                                 [#{person.id}]
                             </Link>
                         </li>
